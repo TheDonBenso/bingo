@@ -15,22 +15,52 @@ var BingoController = (function(){
 });
 
 var UIController = (function(){
-//getDomStrings
-//update cards
+        //getDomStrings
+        var DomStrings = {
+            btnstart : '.btn_start'
 
+        };
+
+        //update cards
+
+
+        return{
+            
+            getDomStrings: function(){
+                return DomStrings;
+            }
+        };
 });
 
-var GlobalController= (function(BingoController, UIController){
-//setup eventlisteners
+var GlobalController= (function(BCtrl, UICtrl){
+    
+    //setup eventlisteners0
+
+    var setupListeners = function(){
+
+        var DOM = UICtrl.getDomStrings();
+         
+        document.querySelector(DOM.btnstart).addEventListener('click', startGame);
+
+    };
+
+var updateDecks;
+
+var startGame = function(){
+    console.log("right here!");
+    alert("ready!");
+};
 
 
 return {
     init: function() {
-
+            setupListeners();
     }
 }
-});
+})(BingoController, UIController);
 
 /*
 Initialize the controller
 */
+
+GlobalController.init();
