@@ -16,8 +16,10 @@ var BingoController = (function(){
 
 var UIController = (function(){
         //getDomStrings
-        var DomStrings = {
-            btnstart : '.btn_start'
+        var domstrings = {
+            btnstart : '.btn_start',
+            deck: '.deck',
+            numberbox: '.numberbox'
 
         };
 
@@ -26,8 +28,8 @@ var UIController = (function(){
 
         return{
             
-            getDomStrings: function(){
-                return DomStrings;
+            getdomstrings: function(){
+                return domstrings;
             }
         };
 });
@@ -38,18 +40,22 @@ var GlobalController= (function(BCtrl, UICtrl){
 
     var setupListeners = function(){
 
-        var DOM = UICtrl.getDomStrings();
+       // var dom = UICtrl.getdomstrings();
          
-        document.querySelector(DOM.btnstart).addEventListener('click', startGame);
+        document.querySelector('.btn_start').addEventListener('click',startGame);
 
     };
 
-var updateDecks;
+    var updateDecks;
 
-var startGame = function(){
-    console.log("right here!");
-    alert("ready!");
-};
+    var startGame = function(){
+        //randomize each players deck
+        //place results onto the decks
+        //initialize the random number generator
+        //start picking your random numbers
+        //restyle picked numbers from the decks
+        alert("ready!");
+    };
 
 
 return {
