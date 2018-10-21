@@ -75,6 +75,20 @@ i {
     margin-left: 10px;
 }
 
+
+.btn_start_decks { 
+    top: 40px;
+
+    font-size: 35px;
+    background: none;
+    border: none;
+    color: rgb(18, 21, 204);
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.1;
+    margin-left: 10px;
+}
 .pickedball
 {
     text-align: center;
