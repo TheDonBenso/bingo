@@ -135,7 +135,7 @@ var GlobalController= (function(BCtrl, UICtrl){
     //setup eventlisteners0
 
     var setupListeners = function(){
-
+        //Problem 1: currently, dom isn't working, I still get the error "uncaught typeerror: _____"
        // var dom = UICtrl.getDOMstrings(); 
         
 
@@ -149,20 +149,20 @@ var GlobalController= (function(BCtrl, UICtrl){
     };
 
     var startGame = function(){
-        //randomize each players deck
+        //load the ball roller with the numbers 1-90
         BCtrl.LoadRoller;
-        BCtrl.loadDecks;
-
-        var getballroller = BCtrl.data.getballroller;
+      
+        var getballroller = BCtrl.data.getballroller();
         var getboundballroller = getballroller.bind(BCtrl.data);
         UICtrl.displayNumbers(getboundballroller)
-        //place results onto the decks
+                
+        //randomize each players deck 
+        //  BCtrl.loadDecks;
+        
         //initialize the random number generator
+        //place results onto the picked class line 17 of index.html
         //start picking your random numbers
-        //restyle picked numbers from the decks
-        console.log(BCtrl.testingBall);
-       // BCtrl.GetBallRoller.ballRoller = [];
-      //  console.log(BCtrl.GetBallRoller.ballRoller);
+        //restyle picked numbers on the players decks
        
     };
 
