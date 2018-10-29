@@ -26,7 +26,7 @@ var data = {
 //
 
 return {
-
+    //ball roller will have hold numbers 1 to 90, array starts empty, this methods loads no 1-90
     LoadRoller : function(){
 
         for(i=1; i<=90; i++)
@@ -34,7 +34,8 @@ return {
             data.ballRoller[i] = i;
         }
     }, 
-
+    
+    //this method acts as the random selector of the ball from the roller. 
     SetRandomPick : function(){
       var pick
         do{
@@ -51,18 +52,21 @@ return {
        
 
     },
-
+    //this method shall check the random number picked from above and checks through a ticket
+    //in the deck
     CheckTicketLine: function(num){
 
 
     },
 
+    //this method is for testing sake
     GetBallRoller: function(){
         return {
             ballRoller: data.ballRoller
         }
     },
 
+    //loads the players decks with a ticket filled with 18 randomly selected numbers
     LoadDecks : function(){
         var randomTicket = [];
         
