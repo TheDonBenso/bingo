@@ -2,24 +2,19 @@
 setup MVC style
 */
 
-var BingoController = (function(){
+var BingoController = ( function(){
 //Populate Cards
 
 //populate rolling basket with 90 balls 
 var data = {
 
-    ballRoller : [0,1],
-    pickedBalls : [0,1],
+    ballRoller : [],
+    pickedBalls : [], 
+    ticketPopulator :  
+      [  [], [],[]]
+        
 
-    ticketpopulator :   [   [0,1], //deck1
-                                [0,1], //deck2
-                                    [0,1] //deck3
-                        ],
-
-    getballroller: function(){
-        return this.ballroller;
-    }
-};
+}
 //setup arrays 
 
 //3 arrays for each card
@@ -70,35 +65,28 @@ return {
     LoadDecks : function(){
         var randomTicket = [];
         
-        for(x = 0; x<18; x++)
+        for(x = 0; x<3; x++)
         {
-             var pick = Math.random() * 100;
-            
-            if(1<=pick<=90)
-            {            
-  
-               if( (x+1) % 3 === 0 ){
-                   data.ticketpopulator[2].map(pick).sort();
-               } else if ((x+1)%2 ===0){
-                   data.ticketpopulator[1].map(pick).sort();
-               } else {
-                   data.ticketpopulator[0].map(pick).sort();
-               }
-
+            randomTicket.splice(0, randomTicket.length);
+            for(i=0;i<6;i++)
+            {
+                 var pick = Math.random() * 100;
+                if(1<=pick<=90)
+                {                     
+                    randomTicket[i] = Math.round(pick);                    
+                }
             }
+            data.ticketPopulator[x] = randomTicket.slice(0);            
         }
-       
-
-
-
         console.log(randomTicket);
-        
+    },
+
+    GetData : function(){
+        return data;
     }
+}
 
-
-};
-
-});
+})();
 
 var UIController = (function(){
         //getDomStrings
@@ -108,7 +96,7 @@ var UIController = (function(){
                 numberbox: '.numberbox',
                 btn_start_decks: '.btn_start_decks'
 
-        };
+        }
 
         //update cards
 
@@ -117,25 +105,31 @@ var UIController = (function(){
                 var str_rollers = "";
                 for(x=1; x<=90;x++)
                 {
-                    str_rollers += rollers.ballRoller[x]+", "
+                    str_rollers += rollers[x]+", "
                     //displayontohtml
                 }
 
                 document.querySelector('.bingo_roller_numbers').textContent = str_rollers;
             },
 
+            LoadDecks: function(decks){
+
+
+            },
+            
             getDOMstrings: function(){
                 return domstrings;
             }
 
 
-        };  
+        } 
        
         
-});
+})();
 
 var GlobalController= (function(BCtrl, UICtrl){
-    
+      var bingodata = BCtrl.GetData();
+
     //setup eventlisteners0
 
     var setupListeners = function(){
@@ -149,16 +143,25 @@ var GlobalController= (function(BCtrl, UICtrl){
     };
 
     var loadDecks = function(){
-        alert("Decks ready!");
+        console.log(bingodata.ticketPopulator);
+        BCtrl.LoadDecks();
+       console.log(bingodata.ticketPopulator);
+       UICtrl.LoadDecks(bingodata.ticketPopulator);
+       
+
     };
 
     var startGame = function(){
         //load the ball roller with the numbers 1-90
-        BCtrl.LoadRoller;
       
-        var getballroller = BCtrl.data.getballroller();
-        var getboundballroller = getballroller.bind(BCtrl.data);
-        UICtrl.displayNumbers(getboundballroller)
+        console.log(bingodata);
+
+        console.log(bingodata.ticketPopulator);
+
+        
+        BCtrl.LoadRoller();       
+       
+        UICtrl.displayNumbers(bingodata.ballRoller);
                 
         //randomize each players deck 
         //  BCtrl.loadDecks;
