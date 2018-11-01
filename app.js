@@ -11,8 +11,10 @@ var data = {
     ballRoller : [],
     pickedBalls : [], 
     ticketPopulator :  
-      [  [], [],[]]
-        
+      [     [], 
+            [],
+            []
+    ]   
 
 }
 //setup arrays 
@@ -54,20 +56,14 @@ return {
 
     },
 
-    //this method is for testing sake
-    GetBallRoller: function(){
-        return {
-            ballRoller: data.ballRoller
-        }
-    },
-
+    
     //loads the players decks with a ticket filled with 18 randomly selected numbers
     LoadDecks : function(){
         var randomTicket = [];
         
         for(x = 0; x<3; x++)
         {
-            randomTicket.splice(0, randomTicket.length);
+            randomTicket.splice(0, 6);
             for(i=0;i<6;i++)
             {
                  var pick = Math.random() * 100;
@@ -76,9 +72,20 @@ return {
                     randomTicket[i] = Math.round(pick);                    
                 }
             }
-            data.ticketPopulator[x] = randomTicket.slice(0);            
+
+            data.ticketPopulator[x] = randomTicket.slice(0); 
         }
-        console.log(randomTicket);
+    },
+
+    //clears all the numbers in a deck, may use this when restarting the game
+    //use this function when you want to load a new ticketline
+    ClearDecks : function(){
+
+        console.log("clearing array");
+        data.ticketPopulator[0].splice(0, 6);
+        data.ticketPopulator[1].splice(0, 6);
+        data.ticketPopulator[2].splice(0, 6);
+
     },
 
     GetData : function(){
@@ -94,7 +101,8 @@ var UIController = (function(){
                 btnstart : '.btn_start',
                 deck: '.deck',
                 numberbox: '.numberbox',
-                btn_start_decks: '.btn_start_decks'
+                btn_start_decks: '.btn_start_decks',
+                bingo_roller_numbers : '.bingo_roller_numbers'
 
         }
 
@@ -109,12 +117,32 @@ var UIController = (function(){
                     //displayontohtml
                 }
 
-                document.querySelector('.bingo_roller_numbers').textContent = str_rollers;
+                document.querySelector(domstrings.bingo_roller_numbers).textContent = str_rollers;
             },
 
-            LoadDecks: function(decks){
+            LoadDecks: function(decks, decknumber){
 
+                console.log(decks);
+               for(i<0; i<3; i++){
+                console.log(i);
+                    for( x=0; x<6; x++){
+                        console.log(x);
+                        element = domstrings.deck;
+                        
+                        var html = '<div class="numberbox" id="box_%id%">%number%</div>';
+                
 
+                        
+                            // Replace the placeholder text with some actual data
+                        var newHtml = html.replace('%id%', x+1);
+                        console.log(decks[i][x]);
+                        newHtml = newhtml.replace('%number%', decks[i][x]);
+                            // Insert the HTML into the DOM
+                        document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+                    }
+                }
+
+                console.log("finished loading");
             },
             
             getDOMstrings: function(){
@@ -134,19 +162,20 @@ var GlobalController= (function(BCtrl, UICtrl){
 
     var setupListeners = function(){
         //Problem 1: currently, dom isn't working, I still get the error "uncaught typeerror: _____"
-       // var dom = UICtrl.getDOMstrings(); 
+        var dom = UICtrl.getDOMstrings(); 
         
 
-        document.querySelector('.btn_start').addEventListener('click',startGame);
+        document.querySelector(dom.btnstart).addEventListener('click',startGame);
  
-        document.querySelector('.btn_start_decks').addEventListener('click',loadDecks);
+        document.querySelector(dom.btn_start_decks).addEventListener('click',loadDecks);
     };
 
     var loadDecks = function(){
-        console.log(bingodata.ticketPopulator);
+        
         BCtrl.LoadDecks();
-       console.log(bingodata.ticketPopulator);
-       UICtrl.LoadDecks(bingodata.ticketPopulator);
+        console.log(bingodata.ticketPopulator);
+        UICtrl.LoadDecks(bingodata.ticketPopulator, 1);
+     
        
 
     };
@@ -154,10 +183,6 @@ var GlobalController= (function(BCtrl, UICtrl){
     var startGame = function(){
         //load the ball roller with the numbers 1-90
       
-        console.log(bingodata);
-
-        console.log(bingodata.ticketPopulator);
-
         
         BCtrl.LoadRoller();       
        
