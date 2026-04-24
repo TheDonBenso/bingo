@@ -7,6 +7,134 @@
 
 
 /**********************************************
+*** BINGO ROLLER NUMBERS
+**********************************************/
+
+.bingo_roller_numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background-color: #fff;
+    color: #333;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.number.drawn {
+    background-color: #4CAF50;
+    color: #fff;
+    border-color: #45a049;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
+}
+
+.number.latest {
+    background-color: #FF9800;
+    color: #fff;
+    border-color: #e68900;
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.8);
+    transform: scale(1.15);
+    animation: pulse 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1.15);
+    }
+    50% {
+        transform: scale(1.25);
+    }
+}
+
+/**********************************************
+*** BINGO PICKED NUMBERS
+**********************************************/
+
+.bingo_picked_numbers {
+    text-align: center;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/**********************************************
+*** CARD DECK NUMBERS  
+**********************************************/
+
+.deck {
+    height: 9vh;
+    padding: 1px;
+    width: 100%;
+    overflow: hidden;
+    background: burlywood;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.numberbox.number {
+    height: auto;
+    width: 18%;
+    border-radius: 5px;
+    border: 2px solid #333;
+    padding: 10px;
+    flex: 1 1 calc(20% - 2px);
+    background-color: #EB4D4D;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.numberbox.number.drawn {
+    background-color: #4CAF50;
+    color: #fff;
+    border-color: #45a049;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
+}
+
+.numberbox.number.latest {
+    background-color: #FF9800;
+    color: #fff;
+    border-color: #e68900;
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.8);
+    transform: scale(1.1);
+    animation: pulse-ticket 0.6s ease-in-out;
+}
+
+@keyframes pulse-ticket {
+    0%, 100% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/**********************************************
 *** TOP PART
 **********************************************/
 
@@ -76,7 +204,7 @@ i {
 }
 
 
-.btn_start_decks { 
+.btn_load_decks { 
     top: 40px;
 
     font-size: 35px;
