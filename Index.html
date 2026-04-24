@@ -6,116 +6,42 @@
     <title>Bingo by Benson</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
-    
 </head>
 <body>
     <div class="top">
         <div class="bingo_title">BINGO</div>
         <div class="btn_start" id="btnStart">Start Game</div>
-        <div class="btn_load_decks" id="btnLoadDecks">LoadDecks</div>
-        <div class="row bingo_roller_numbers" id="rollernumbers"> </div>
+        <div class="btn_load_decks" id="btnLoadDecks">Load Decks</div>
+        <div class="row bingo_roller_numbers" id="rollernumbers"></div>
         <div class="row bingo_picked_numbers" id="pickednumber"></div>
     </div>
     <div class="bottom">
-
         <div class="leftside">
-            
             <div class="playercard">
-                <div class="deck" id="player_1_deck_1">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                
-                </div>
-                <div class="deck" id="player_1_deck_2">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck"id="player_1_deck_3">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
+                <div class="player_title">Player 1</div>
+                <div class="deck" id="player_1_deck_1"></div>
+                <div class="deck" id="player_1_deck_2"></div>
+                <div class="deck" id="player_1_deck_3"></div>
             </div>
             <div class="playercard">
-                <div class="deck" id="player_2_deck_1">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_2_deck_2">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_2_deck_3">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
+                <div class="player_title">Player 2</div>
+                <div class="deck" id="player_2_deck_1"></div>
+                <div class="deck" id="player_2_deck_2"></div>
+                <div class="deck" id="player_2_deck_3"></div>
             </div>
         </div>
-
         <div class="rightside">
-
-            <div class="playercard" >
-                <div class="deck" id="player_3_deck_1">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_3_deck_2">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_3_deck_3">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
+            <div class="playercard">
+                <div class="player_title">Player 3</div>
+                <div class="deck" id="player_3_deck_1"></div>
+                <div class="deck" id="player_3_deck_2"></div>
+                <div class="deck" id="player_3_deck_3"></div>
             </div>
             <div class="playercard">
-                <div class="deck" id="player_4_deck_1">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_4_deck_2">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
-                <div class="deck" id="player_4_deck_3">
-                    <div class="numberbox" id="box_1">5</div>
-                    <div class="numberbox" id="box_2">15</div>
-                    <div class="numberbox" id="box_3">25</div>
-                    <div class="numberbox" id="box_4">35</div>
-                    <div class="numberbox" id="box_5">45</div>
-                </div>
+                <div class="player_title">Player 4</div>
+                <div class="deck" id="player_4_deck_1"></div>
+                <div class="deck" id="player_4_deck_2"></div>
+                <div class="deck" id="player_4_deck_3"></div>
             </div>
         </div>
     </div>
