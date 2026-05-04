@@ -1,214 +1,415 @@
-/* 
+/*
 setup MVC style
 */
 
-var BingoController = ( function(){
-//Populate Cards
+var BingoController = (function() {
+    // Data layer: ticket numbers and ticket marks are kept separate from UI
+    var data = {
+        ballRoller: [],
+        pickedBalls: [],
+        ticketPopulator: [],
+        ticketMarks: []
+    };
 
-//populate rolling basket with 90 balls 
-var data = {
-
-    ballRoller : [],
-    pickedBalls : [], 
-    ticketPopulator :  
-      [     [], 
-            [],
-            []
-    ]   
-
-}
-//setup arrays 
-
-//3 arrays for each card
-//
-
-return {
-    //ball roller will have hold numbers 1 to 90, array starts empty, this methods loads no 1-90
-    LoadRoller : function(){
-
-        for(i=1; i<=90; i++)
-        {
-            data.ballRoller[i] = i;
+    var shuffle = function(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
-    }, 
-    
-    //this method acts as the random selector of the ball from the roller. 
-    SetRandomPick : function(){
-      var pick
-        do{
-            pick = Math.random() * 100;
-            
-            if(1<pick<90)
-            {
-                data.pickedBalls.push(pick);
-                data.ballRoller.splice(pick+1,1);
-                break;
-             }
-        }
-        while(1 < pick < 90);
-       
+        return array;
+    };
 
-    },
-    //this method shall check the random number picked from above and checks through a ticket
-    //in the deck
-    CheckTicketLine: function(num){
-
-
-    },
-
-    
-    //loads the players decks with a ticket filled with 18 randomly selected numbers
-    LoadDecks : function(){
-        var randomTicket = [];
-        
-        for(x = 0; x<3; x++)
-        {
-            randomTicket.splice(0, 6);
-            for(i=0;i<6;i++)
-            {
-                 var pick = Math.random() * 100;
-                if(1<=pick<=90)
-                {                     
-                    randomTicket[i] = Math.round(pick);                    
-                }
+    var createEmptyMarks = function(rows, cols) {
+        var marks = [];
+        for (var r = 0; r < rows; r++) {
+            var row = [];
+            for (var c = 0; c < cols; c++) {
+                row.push(false);
             }
-
-            data.ticketPopulator[x] = randomTicket.slice(0); 
+            marks.push(row);
         }
-    },
+        return marks;
+    };
 
-    //clears all the numbers in a deck, may use this when restarting the game
-    //use this function when you want to load a new ticketline
-    ClearDecks : function(){
+    var createEmptyPlayerMarks = function(playerCount, rows, cols) {
+        var players = [];
+        for (var player = 0; player < playerCount; player++) {
+            players.push(createEmptyMarks(rows, cols));
+        }
+        return players;
+    };
 
-        console.log("clearing array");
-        data.ticketPopulator[0].splice(0, 6);
-        data.ticketPopulator[1].splice(0, 6);
-        data.ticketPopulator[2].splice(0, 6);
+    // Step 5: build one ticket as a strict 3x6 grid with unique values
+    var generateUniqueTicket = function(rows, cols) {
+        var totalCells = rows * cols;
+        var pool = [];
+        var values = [];
+        var index = 0;
 
-    },
-
-    GetData : function(){
-        return data;
-    }
-}
-
-})();
-
-var UIController = (function(){
-        //getDomStrings
-        var domstrings = {
-                btnstart : '.btn_start',
-                deck: '.deck',
-                numberbox: '.numberbox',
-                btn_start_decks: '.btn_start_decks',
-                bingo_roller_numbers : '.bingo_roller_numbers'
-
+        for (var n = 1; n <= 90; n++) {
+            pool.push(n);
         }
 
-        //update cards
+        shuffle(pool);
 
-        return {
-            displayNumbers: function(rollers){
-                var str_rollers = "";
-                for(x=1; x<=90;x++)
-                {
-                    str_rollers += rollers[x]+", "
-                    //displayontohtml
-                }
+        for (var i = 0; i < totalCells; i++) {
+            values.push(pool[i]);
+        }
 
-                document.querySelector(domstrings.bingo_roller_numbers).textContent = str_rollers;
-            },
+        var ticket = [];
+        for (var r = 0; r < rows; r++) {
+            var row = [];
+            for (var c = 0; c < cols; c++) {
+                row.push(values[index]);
+                index++;
+            }
+            ticket.push(row);
+        }
 
-            LoadDecks: function(decks, decknumber){
+        return ticket;
+    };
 
-                console.log(decks);
-               for(i<0; i<3; i++){
-                console.log(i);
-                    for( x=0; x<6; x++){
-                        console.log(x);
-                        element = domstrings.deck;
-                        
-                        var html = '<div class="numberbox" id="box_%id%">%number%</div>';
-                
+    var generateTicketsForPlayers = function(playerCount, rows, cols) {
+        var players = [];
+        for (var player = 0; player < playerCount; player++) {
+            players.push(generateUniqueTicket(rows, cols));
+        }
+        return players;
+    };
 
-                        
-                            // Replace the placeholder text with some actual data
-                        var newHtml = html.replace('%id%', x+1);
-                        console.log(decks[i][x]);
-                        newHtml = newhtml.replace('%number%', decks[i][x]);
-                            // Insert the HTML into the DOM
-                        document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+    return {
+        LoadRoller: function() {
+            data.ballRoller = [];
+            for (var i = 1; i <= 90; i++) {
+                data.ballRoller.push(i);
+            }
+            shuffle(data.ballRoller);
+            data.pickedBalls = [];
+            data.ticketMarks = createEmptyPlayerMarks(4, 3, 6);
+        },
+
+        SetRandomPick: function() {
+            if (data.ballRoller.length > 0) {
+                var pick = data.ballRoller.shift();
+                data.pickedBalls.push(pick);
+                return pick;
+            }
+            return null;
+        },
+
+        GetGameState: function() {
+            return {
+                pickedBalls: data.pickedBalls.slice(),
+                lastPicked: data.pickedBalls.length > 0 ? data.pickedBalls[data.pickedBalls.length - 1] : null,
+                totalPicked: data.pickedBalls.length,
+                ballsRemaining: data.ballRoller.length
+            };
+        },
+
+        CheckTicketLine: function(num) {
+            var matches = [];
+            for (var player = 0; player < data.ticketPopulator.length; player++) {
+                for (var row = 0; row < data.ticketPopulator[player].length; row++) {
+                    for (var col = 0; col < data.ticketPopulator[player][row].length; col++) {
+                        if (data.ticketPopulator[player][row][col] === num) {
+                            data.ticketMarks[player][row][col] = true;
+                            matches.push({ player: player, row: row, col: col });
+                        }
                     }
                 }
+            }
+            return matches;
+        },
 
-                console.log("finished loading");
-            },
-            
-            getDOMstrings: function(){
-                return domstrings;
+        ResetTicketMarks: function() {
+            data.ticketMarks = createEmptyPlayerMarks(4, 3, 6);
+        },
+
+        HasValidTicket: function() {
+            if (data.ticketPopulator.length !== 4) {
+                return false;
             }
 
+            for (var player = 0; player < 4; player++) {
+                if (!data.ticketPopulator[player] || data.ticketPopulator[player].length !== 3) {
+                    return false;
+                }
 
-        } 
-       
-        
+                for (var row = 0; row < 3; row++) {
+                    if (!data.ticketPopulator[player][row] || data.ticketPopulator[player][row].length !== 6) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        },
+
+        HasWinningRow: function() {
+            for (var player = 0; player < data.ticketMarks.length; player++) {
+                for (var row = 0; row < data.ticketMarks[player].length; row++) {
+                    var rowMarks = data.ticketMarks[player][row];
+                    var rowValues = data.ticketPopulator[player][row];
+                    if (!rowMarks || !rowValues || rowMarks.length !== 6 || rowValues.length !== 6) {
+                        continue;
+                    }
+
+                    var complete = true;
+                    for (var col = 0; col < rowMarks.length; col++) {
+                        if (!rowMarks[col]) {
+                            complete = false;
+                            break;
+                        }
+                    }
+
+                    if (complete) {
+                        return { won: true, player: player, row: row };
+                    }
+                }
+            }
+
+            return { won: false, player: -1, row: -1 };
+        },
+
+        // Step 5 ticket generation: unique numbers, no duplicates, 3x6 data grid
+        LoadDecks: function() {
+            data.ticketPopulator = generateTicketsForPlayers(4, 3, 6);
+            data.ticketMarks = createEmptyPlayerMarks(4, 3, 6);
+        },
+
+        ClearDecks: function() {
+            data.ticketPopulator = [];
+            data.ticketMarks = [];
+        },
+
+        GetTicketState: function() {
+            var players = [];
+            for (var player = 0; player < data.ticketPopulator.length; player++) {
+                var rows = [];
+                for (var row = 0; row < data.ticketPopulator[player].length; row++) {
+                    rows.push(data.ticketPopulator[player][row].slice());
+                }
+                players.push(rows);
+            }
+            return players;
+        },
+
+        GetTicketMarks: function() {
+            var players = [];
+            for (var player = 0; player < data.ticketMarks.length; player++) {
+                var rows = [];
+                for (var row = 0; row < data.ticketMarks[player].length; row++) {
+                    rows.push(data.ticketMarks[player][row].slice());
+                }
+                players.push(rows);
+            }
+            return players;
+        },
+
+        GetData: function() {
+            return data;
+        }
+    };
 })();
 
-var GlobalController= (function(BCtrl, UICtrl){
-      var bingodata = BCtrl.GetData();
-
-    //setup eventlisteners0
-
-    var setupListeners = function(){
-        //Problem 1: currently, dom isn't working, I still get the error "uncaught typeerror: _____"
-        var dom = UICtrl.getDOMstrings(); 
-        
-
-        document.querySelector(dom.btnstart).addEventListener('click',startGame);
- 
-        document.querySelector(dom.btn_start_decks).addEventListener('click',loadDecks);
+var UIController = (function() {
+    var domstrings = {
+        btnstart: '#btnStart',
+        btnLoadDecks: '#btnLoadDecks',
+        bingo_roller_numbers: '.bingo_roller_numbers'
     };
 
-    var loadDecks = function(){
-        
+    var createNumberElement = function(value, className) {
+        var numberEl = document.createElement('div');
+        numberEl.className = 'number ' + (className || '');
+        numberEl.id = 'num_' + value;
+        numberEl.textContent = value;
+        return numberEl;
+    };
+
+    return {
+        displayNumbers: function(rollers) {
+            var container = document.querySelector(domstrings.bingo_roller_numbers);
+            if (!container) {
+                return;
+            }
+
+            container.innerHTML = '';
+
+            for (var i = 0; i < rollers.length; i++) {
+                container.appendChild(createNumberElement(rollers[i]));
+            }
+        },
+
+        updatePickedNumbers: function(pickedBalls) {
+            var rollerContainer = document.querySelector(domstrings.bingo_roller_numbers);
+            if (!rollerContainer) {
+                return;
+            }
+
+            var previousLatestRoller = rollerContainer.querySelector('.latest');
+            if (previousLatestRoller) {
+                previousLatestRoller.classList.remove('latest');
+            }
+
+            var previousLatestTickets = document.querySelectorAll('.deck .number.latest');
+            for (var t = 0; t < previousLatestTickets.length; t++) {
+                previousLatestTickets[t].classList.remove('latest');
+            }
+
+            for (var i = 0; i < pickedBalls.length; i++) {
+                var drawnNumber = pickedBalls[i];
+                var rollerNumber = rollerContainer.querySelector('#num_' + drawnNumber);
+                if (rollerNumber) {
+                    rollerNumber.classList.add('drawn');
+                }
+            }
+
+            var lastNum = null;
+            if (pickedBalls.length > 0) {
+                lastNum = pickedBalls[pickedBalls.length - 1];
+                var latestRoller = rollerContainer.querySelector('#num_' + lastNum);
+                if (latestRoller) {
+                    latestRoller.classList.add('latest');
+                }
+            }
+
+            this.updateTicketNumbers(lastNum);
+        },
+
+        updateTicketNumbers: function(lastPickedNum) {
+            var allTicketNumbers = document.querySelectorAll('.deck .number');
+
+            for (var i = 0; i < allTicketNumbers.length; i++) {
+                var ticketEl = allTicketNumbers[i];
+                var numberValue = parseInt(ticketEl.getAttribute('data-number'), 10);
+                var rollerNum = document.querySelector('#num_' + numberValue);
+
+                if (rollerNum && rollerNum.classList.contains('drawn')) {
+                    ticketEl.classList.add('drawn');
+                }
+
+                if (lastPickedNum !== null && numberValue === lastPickedNum) {
+                    ticketEl.classList.add('latest');
+                }
+            }
+        },
+
+        // Render every player ticket from state only (no placeholder markup)
+        LoadDecks: function(playerDecks) {
+            for (var player = 0; player < playerDecks.length; player++) {
+                for (var row = 0; row < 3; row++) {
+                    var deckSelector = '#player_' + (player + 1) + '_deck_' + (row + 1);
+                    var deckElement = document.querySelector(deckSelector);
+                    if (!deckElement) {
+                        continue;
+                    }
+
+                    deckElement.innerHTML = '';
+
+                    for (var col = 0; col < 6; col++) {
+                        var value = playerDecks[player][row][col];
+                        var numberEl = document.createElement('div');
+                        numberEl.className = 'number numberbox';
+                        numberEl.id = 'ticket_' + (player + 1) + '_r' + row + '_c' + col;
+                        numberEl.setAttribute('data-number', value);
+                        numberEl.textContent = value;
+                        deckElement.appendChild(numberEl);
+                    }
+                }
+            }
+        },
+
+        getDOMstrings: function() {
+            return domstrings;
+        },
+
+        validateEventListeners: function() {
+            return {
+                btnStart: !!document.querySelector(domstrings.btnstart),
+                btnLoadDecks: !!document.querySelector(domstrings.btnLoadDecks),
+                rollerContainer: !!document.querySelector(domstrings.bingo_roller_numbers)
+            };
+        }
+    };
+})();
+
+var GlobalController = (function(BCtrl, UICtrl) {
+    var bingodata = BCtrl.GetData();
+    var drawIntervalId = null;
+
+    var checkWin = function() {
+        var winState = BCtrl.HasWinningRow();
+        if (winState.won) {
+            alert('BINGO! Player ' + (winState.player + 1) + ' row ' + (winState.row + 1) + ' complete!');
+            return true;
+        }
+        return false;
+    };
+
+    var setupListeners = function() {
+        var dom = UICtrl.getDOMstrings();
+
+        var btnStart = document.querySelector(dom.btnstart);
+        if (btnStart) {
+            btnStart.addEventListener('click', startGame);
+        }
+
+        var btnLoadDecks = document.querySelector(dom.btnLoadDecks);
+        if (btnLoadDecks) {
+            btnLoadDecks.addEventListener('click', loadDecks);
+        }
+    };
+
+    var loadDecks = function() {
         BCtrl.LoadDecks();
-        console.log(bingodata.ticketPopulator);
-        UICtrl.LoadDecks(bingodata.ticketPopulator, 1);
-     
-       
-
+        UICtrl.LoadDecks(BCtrl.GetTicketState());
     };
 
-    var startGame = function(){
-        //load the ball roller with the numbers 1-90
-      
-        
-        BCtrl.LoadRoller();       
-       
+    var startGame = function() {
+        if (drawIntervalId) {
+            clearInterval(drawIntervalId);
+            drawIntervalId = null;
+        }
+
+        if (!BCtrl.HasValidTicket()) {
+            loadDecks();
+        }
+
+        BCtrl.ResetTicketMarks();
+        BCtrl.LoadRoller();
         UICtrl.displayNumbers(bingodata.ballRoller);
-                
-        //randomize each players deck 
-        //  BCtrl.loadDecks;
-        
-        //initialize the random number generator
-        //place results onto the picked class line 17 of index.html
-        //start picking your random numbers
-        //restyle picked numbers on the players decks
-       
-    };
+        UICtrl.updatePickedNumbers([]);
 
+        drawIntervalId = setInterval(function() {
+            var pick = BCtrl.SetRandomPick();
+            if (pick === null) {
+                clearInterval(drawIntervalId);
+                drawIntervalId = null;
+                alert('No winner - all balls drawn!');
+                return;
+            }
+
+            var gameState = BCtrl.GetGameState();
+            UICtrl.updatePickedNumbers(gameState.pickedBalls);
+
+            BCtrl.CheckTicketLine(gameState.lastPicked);
+
+            if (checkWin()) {
+                clearInterval(drawIntervalId);
+                drawIntervalId = null;
+            }
+        }, 1000);
+    };
 
     return {
         init: function() {
-            
             setupListeners();
+            UICtrl.validateEventListeners();
         }
-    }
+    };
 })(BingoController, UIController);
-
-/*
-Initialize the controller
-*/
 
 GlobalController.init();
