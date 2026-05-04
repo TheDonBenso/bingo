@@ -81,10 +81,9 @@ var BingoController = (function() {
 
     return {
         LoadRoller: function() {
-            data.ballRoller = [];
-            for (var i = 1; i <= 90; i++) {
-                data.ballRoller.push(i);
-            }
+            data.ballRoller = Array.apply(null, { length: 90 }).map(function(_, i) {
+                return i + 1;
+            });
             shuffle(data.ballRoller);
             data.pickedBalls = [];
             data.ticketMarks = createEmptyPlayerMarks(4, 3, 6);
