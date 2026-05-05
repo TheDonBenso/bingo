@@ -290,18 +290,13 @@ i {
     width: 100%;
     overflow: hidden;
     background: burlywood;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2px;
 }
 .numberbox
 {
-    height: 10vh;
-    width: 19vh;
-    border: 1cm;
-    margin-right: 1px;
-    background-color: #EB4D4D;
-    color: #fff;
-    text-align: center;
-    padding-top: 25px;
-    float: left;
+    float: none;
 }
 
 ul {
