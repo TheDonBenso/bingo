@@ -22,61 +22,42 @@ var BingoController = (function() {
     };
 
     var createEmptyMarks = function(rows, cols) {
-        var marks = [];
-        for (var r = 0; r < rows; r++) {
-            var row = [];
-            for (var c = 0; c < cols; c++) {
-                row.push(false);
-            }
-            marks.push(row);
-        }
-        return marks;
+        return Array.apply(null, { length: rows }).map(function() {
+            return Array.apply(null, { length: cols }).map(function() {
+                return false;
+            });
+        });
     };
 
     var createEmptyPlayerMarks = function(playerCount, rows, cols) {
-        var players = [];
-        for (var player = 0; player < playerCount; player++) {
-            players.push(createEmptyMarks(rows, cols));
-        }
-        return players;
+        return Array.apply(null, { length: playerCount }).map(function() {
+            return createEmptyMarks(rows, cols);
+        });
     };
 
     // Step 5: build one ticket as a strict 3x6 grid with unique values
     var generateUniqueTicket = function(rows, cols) {
         var totalCells = rows * cols;
-        var pool = [];
-        var values = [];
-        var index = 0;
 
-        for (var n = 1; n <= 90; n++) {
-            pool.push(n);
-        }
+        var pool = Array.apply(null, { length: 90 }).map(function(_, i) {
+            return i + 1;
+        });
 
         shuffle(pool);
 
-        for (var i = 0; i < totalCells; i++) {
-            values.push(pool[i]);
-        }
+        var values = pool.slice(0, totalCells);
 
-        var ticket = [];
-        for (var r = 0; r < rows; r++) {
-            var row = [];
-            for (var c = 0; c < cols; c++) {
-                row.push(values[index]);
-                index++;
-            }
-            ticket.push(row);
-        }
-
-        return ticket;
+        return Array.apply(null, { length: rows }).map(function(_, r) {
+            return Array.apply(null, { length: cols }).map(function(_, c) {
+                return values[r * cols + c];
+            });
+        });
     };
 
     var generateTicketsForPlayers = function(playerCount, rows, cols) {
-        var players = [];
-        for (var player = 0; player < playerCount; player++) {
-            players.push(generateUniqueTicket(rows, cols));
-        }
-        return players;
+        return Array.apply(null, { length: playerCount }).map(function() {
+            return generateUniqueTicket(rows, cols);
+        });
     };
 
     return {
@@ -108,18 +89,25 @@ var BingoController = (function() {
         },
 
         CheckTicketLine: function(num) {
-            var matches = [];
-            for (var player = 0; player < data.ticketPopulator.length; player++) {
-                for (var row = 0; row < data.ticketPopulator[player].length; row++) {
-                    for (var col = 0; col < data.ticketPopulator[player][row].length; col++) {
-                        if (data.ticketPopulator[player][row][col] === num) {
-                            data.ticketMarks[player][row][col] = true;
-                            matches.push({ player: player, row: row, col: col });
+            var mappedMatches = data.ticketPopulator.map(function(playerRows, player) {
+                return playerRows.map(function(rowValues, row) {
+                    return rowValues.map(function(cellValue, col) {
+                        if (cellValue !== num) {
+                            return null;
                         }
-                    }
-                }
-            }
-            return matches;
+
+                        data.ticketMarks[player][row][col] = true;
+                        return { player: player, row: row, col: col };
+                    });
+                });
+            });
+
+            var firstPassFlatten = Array.prototype.concat.apply([], mappedMatches);
+            var secondPassFlatten = Array.prototype.concat.apply([], firstPassFlatten);
+
+            return secondPassFlatten.filter(function(match) {
+                return match !== null;
+            });
         },
 
         ResetTicketMarks: function() {
@@ -131,42 +119,54 @@ var BingoController = (function() {
                 return false;
             }
 
-            for (var player = 0; player < 4; player++) {
-                if (!data.ticketPopulator[player] || data.ticketPopulator[player].length !== 3) {
+            var playerChecks = data.ticketPopulator.map(function(playerRows) {
+                if (!playerRows || playerRows.length !== 3) {
                     return false;
                 }
 
-                for (var row = 0; row < 3; row++) {
-                    if (!data.ticketPopulator[player][row] || data.ticketPopulator[player][row].length !== 6) {
-                        return false;
-                    }
-                }
-            }
+                var rowChecks = playerRows.map(function(rowValues) {
+                    return !!rowValues && rowValues.length === 6;
+                });
 
-            return true;
+                return rowChecks.every(function(isValidRow) {
+                    return isValidRow;
+                });
+            });
+
+            return playerChecks.every(function(isValidPlayer) {
+                return isValidPlayer;
+            });
         },
 
         HasWinningRow: function() {
-            for (var player = 0; player < data.ticketMarks.length; player++) {
-                for (var row = 0; row < data.ticketMarks[player].length; row++) {
-                    var rowMarks = data.ticketMarks[player][row];
-                    var rowValues = data.ticketPopulator[player][row];
+            var winningCandidates = data.ticketMarks.map(function(playerMarks, player) {
+                return playerMarks.map(function(rowMarks, row) {
+                    var rowValues = data.ticketPopulator[player] && data.ticketPopulator[player][row];
                     if (!rowMarks || !rowValues || rowMarks.length !== 6 || rowValues.length !== 6) {
-                        continue;
+                        return null;
                     }
 
-                    var complete = true;
-                    for (var col = 0; col < rowMarks.length; col++) {
-                        if (!rowMarks[col]) {
-                            complete = false;
-                            break;
-                        }
-                    }
+                    var isComplete = rowMarks.map(function(mark) {
+                        return !!mark;
+                    }).every(function(mark) {
+                        return mark;
+                    });
 
-                    if (complete) {
+                    if (isComplete) {
                         return { won: true, player: player, row: row };
                     }
-                }
+
+                    return null;
+                });
+            });
+
+            var flattenedCandidates = Array.prototype.concat.apply([], winningCandidates);
+            var winners = flattenedCandidates.filter(function(candidate) {
+                return candidate !== null;
+            });
+
+            if (winners.length > 0) {
+                return winners[0];
             }
 
             return { won: false, player: -1, row: -1 };
@@ -184,27 +184,19 @@ var BingoController = (function() {
         },
 
         GetTicketState: function() {
-            var players = [];
-            for (var player = 0; player < data.ticketPopulator.length; player++) {
-                var rows = [];
-                for (var row = 0; row < data.ticketPopulator[player].length; row++) {
-                    rows.push(data.ticketPopulator[player][row].slice());
-                }
-                players.push(rows);
-            }
-            return players;
+            return data.ticketPopulator.map(function(playerRows) {
+                return playerRows.map(function(row) {
+                    return row.slice();
+                });
+            });
         },
 
         GetTicketMarks: function() {
-            var players = [];
-            for (var player = 0; player < data.ticketMarks.length; player++) {
-                var rows = [];
-                for (var row = 0; row < data.ticketMarks[player].length; row++) {
-                    rows.push(data.ticketMarks[player][row].slice());
-                }
-                players.push(rows);
-            }
-            return players;
+            return data.ticketMarks.map(function(playerRows) {
+                return playerRows.map(function(rowMarks) {
+                    return rowMarks.slice();
+                });
+            });
         },
 
         GetData: function() {
@@ -237,9 +229,13 @@ var UIController = (function() {
 
             container.innerHTML = '';
 
-            for (var i = 0; i < rollers.length; i++) {
-                container.appendChild(createNumberElement(rollers[i]));
-            }
+            rollers
+                .map(function(value) {
+                    return createNumberElement(value);
+                })
+                .forEach(function(numberEl) {
+                    container.appendChild(numberEl);
+                });
         },
 
         updatePickedNumbers: function(pickedBalls) {
@@ -254,17 +250,16 @@ var UIController = (function() {
             }
 
             var previousLatestTickets = document.querySelectorAll('.deck .number.latest');
-            for (var t = 0; t < previousLatestTickets.length; t++) {
-                previousLatestTickets[t].classList.remove('latest');
-            }
+            Array.prototype.forEach.call(previousLatestTickets, function(ticketEl) {
+                ticketEl.classList.remove('latest');
+            });
 
-            for (var i = 0; i < pickedBalls.length; i++) {
-                var drawnNumber = pickedBalls[i];
+            pickedBalls.forEach(function(drawnNumber) {
                 var rollerNumber = rollerContainer.querySelector('#num_' + drawnNumber);
                 if (rollerNumber) {
                     rollerNumber.classList.add('drawn');
                 }
-            }
+            });
 
             var lastNum = null;
             if (pickedBalls.length > 0) {
@@ -281,8 +276,7 @@ var UIController = (function() {
         updateTicketNumbers: function(lastPickedNum) {
             var allTicketNumbers = document.querySelectorAll('.deck .number');
 
-            for (var i = 0; i < allTicketNumbers.length; i++) {
-                var ticketEl = allTicketNumbers[i];
+            Array.prototype.map.call(allTicketNumbers, function(ticketEl) {
                 var numberValue = parseInt(ticketEl.getAttribute('data-number'), 10);
                 var rollerNum = document.querySelector('#num_' + numberValue);
 
@@ -293,32 +287,34 @@ var UIController = (function() {
                 if (lastPickedNum !== null && numberValue === lastPickedNum) {
                     ticketEl.classList.add('latest');
                 }
-            }
+
+                return ticketEl;
+            });
         },
 
         // Render every player ticket from state only (no placeholder markup)
         LoadDecks: function(playerDecks) {
-            for (var player = 0; player < playerDecks.length; player++) {
-                for (var row = 0; row < 3; row++) {
+            playerDecks.map(function(playerRows, player) {
+                return playerRows.map(function(rowValues, row) {
                     var deckSelector = '#player_' + (player + 1) + '_deck_' + (row + 1);
                     var deckElement = document.querySelector(deckSelector);
                     if (!deckElement) {
-                        continue;
+                        return null;
                     }
 
                     deckElement.innerHTML = '';
 
-                    for (var col = 0; col < 6; col++) {
-                        var value = playerDecks[player][row][col];
+                    return rowValues.map(function(value, col) {
                         var numberEl = document.createElement('div');
                         numberEl.className = 'number numberbox';
                         numberEl.id = 'ticket_' + (player + 1) + '_r' + row + '_c' + col;
                         numberEl.setAttribute('data-number', value);
                         numberEl.textContent = value;
                         deckElement.appendChild(numberEl);
-                    }
-                }
-            }
+                        return numberEl;
+                    });
+                });
+            });
         },
 
         getDOMstrings: function() {
@@ -339,10 +335,15 @@ var GlobalController = (function(BCtrl, UICtrl) {
     var bingodata = BCtrl.GetData();
     var drawIntervalId = null;
 
+    var announce = function(message) {
+        alert(this.playerName + ' — ' + message);
+    };
+
     var checkWin = function() {
         var winState = BCtrl.HasWinningRow();
         if (winState.won) {
-            alert('BINGO! Player ' + (winState.player + 1) + ' row ' + (winState.row + 1) + ' complete!');
+            var playerContext = { playerName: 'Player ' + (winState.player + 1) };
+            announce.call(playerContext, 'BINGO! Row ' + (winState.row + 1) + ' complete!');
             return true;
         }
         return false;
@@ -379,10 +380,10 @@ var GlobalController = (function(BCtrl, UICtrl) {
 
         BCtrl.ResetTicketMarks();
         BCtrl.LoadRoller();
-        UICtrl.displayNumbers(bingodata.ballRoller);
+        UICtrl.displayNumbers.apply(UICtrl, [bingodata.ballRoller]);
         UICtrl.updatePickedNumbers([]);
 
-        drawIntervalId = setInterval(function() {
+        var drawTick = function() {
             var pick = BCtrl.SetRandomPick();
             if (pick === null) {
                 clearInterval(drawIntervalId);
@@ -400,7 +401,9 @@ var GlobalController = (function(BCtrl, UICtrl) {
                 clearInterval(drawIntervalId);
                 drawIntervalId = null;
             }
-        }, 1000);
+        }.bind(GlobalController);
+
+        drawIntervalId = setInterval(drawTick, 1000);
     };
 
     return {
